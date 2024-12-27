@@ -24,7 +24,7 @@ class TemplateMainWindow(QtWidgets.QMainWindow):
         self.count_spinbox.setAlignment(QtCore.Qt.AlignHCenter)
         self.count_spinbox.setRange(-2**31, 2**31-1)
         self.count_spinbox.setValue(0)
-        self.label = QtWidgets.QLabel('Useless counter goes brrr...')
+        self.label = QtWidgets.QLabel('Useless counter TER...')
         font = QtGui.QFont()
         font.setBold(True)
         self.label.setFont(font)
