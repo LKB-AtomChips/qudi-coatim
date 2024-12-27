@@ -1,16 +1,12 @@
-# qudi-addon-template
+# qudi-coatim
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 ---
 
-A template repository to create your own pip-installable qudi namespace addon packages.
+A qudi-core module to image cold atoms.
 
-Replace this README.md with your own projects' readme.
+### Institutions
+- [Laboratoire Kastler-Brossel](https://lkb.fr/) (Laboratoire Kastler-Brossel)
 
-> __WARNING:__
-> 
-> Do __NOT__ put any `__init__.py` files into qudi namespace packages. Doing so will prevent any 
-> addon packages to install additional modules into the respective package or any sub-packages.
-> 
-> You can however create your own non-namespace packages (including `__init__.py`). Just make sure 
-> you do not want to install any addons later on in this package or any sub-packages thereof.
+### People
+- [Clément Raphin](mailto:clement.raphin@lkb.ens.fr?subject=[qudi]%20Contact%20Author)
