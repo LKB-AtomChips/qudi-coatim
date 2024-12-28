@@ -3,7 +3,7 @@
 __all__ = ['GuppyDummy']
 
 import time
-
+import numpy as np
 from qudi.interface.camera_interface import CameraInterface
 from qudi.core.statusvariable import StatusVar
 from qudi.core.configoption import ConfigOption
