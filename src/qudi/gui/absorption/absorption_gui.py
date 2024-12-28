@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['TemplateGui']
+__all__ = ['AbsorptionGui'] # don't really know why this is here
 
 from PySide2 import QtCore
 
 from qudi.core.module import GuiBase
 from qudi.core.connector import Connector
-from qudi.gui.template.template_main_window import TemplateMainWindow
+from qudi.gui.absorption.absorption_main_window import AbsorptionMainWindow
 
 
 # qudi GUI measurement modules must inherit qudi.core.module.GuiBase or other GUI modules.
-class TemplateGui(GuiBase):
+class AbsorptionGui(GuiBase):
     """ This is a simple template GUI measurement module for qudi """
     # Signal declaration for outgoing control signals to logic
     sigAddToCounter = QtCore.Signal(int)  # add an integer value to the counter value
 
     # Connector declaration for a logic module to interact with
-    _template_logic = Connector(name='template_logic', interface='TemplateLogic')
+    _template_logic = Connector(name='absorption_logic', interface='AbsorptionLogic')
 
     # Declare static parameters that can/must be declared in the qudi configuration
     # _my_config_option = ConfigOption(name='my_config_option', default=1, missing='warn')
@@ -27,7 +27,7 @@ class TemplateGui(GuiBase):
 
     def on_activate(self) -> None:
         # initialize the main window
-        self._mw = TemplateMainWindow()
+        self._mw = AbsorptionMainWindow()
         self._mw.count_spinbox.setValue(self._template_logic().counter_value)
         # connect all GUI internal signals
         self._mw.sub_ten_button.clicked.connect(self._subtract_ten)
