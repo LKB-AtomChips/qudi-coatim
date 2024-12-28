@@ -4,13 +4,13 @@ __all__ = ['GuppyDummy']
 
 import time
 
-from qudi.interface.template_interface import TemplateInterface
+from qudi.interface.absorption_interface import AbsorptionInterface
 from qudi.core.statusvariable import StatusVar
 from qudi.core.configoption import ConfigOption
 from qudi.util.mutex import Mutex
 
 
-class GuppyDummy(TemplateInterface):
+class GuppyDummy(AbsorptionInterface):
     """ Dummy module for AlliedVision GuppyPro camera """
 
     # Declare static parameters that can/must be declared in the qudi configuration

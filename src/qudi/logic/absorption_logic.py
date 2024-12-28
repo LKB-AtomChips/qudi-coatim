@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['TemplateLogic']
+__all__ = ['AbsorptionLogic']
 
 from PySide2 import QtCore
 
@@ -13,12 +13,12 @@ from qudi.util.mutex import Mutex
 
 # qudi logic measurement modules must inherit qudi.core.module.LogicBase or other logic modules.
 class AbsorptionLogic(LogicBase):
-    """ This is a simple template logic measurement module for qudi.
+    """ This logic modules allows computation of absorption & density from images.
 
     Example config that goes into the config file:
 
     example_logic:
-        module.Class: 'template_logic.TemplateLogic'
+        module.Class: 'absorption_logic.AbsorptionLogic'
         options:
             increment_interval: 2
         connect:

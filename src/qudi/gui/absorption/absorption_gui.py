@@ -11,12 +11,12 @@ from qudi.gui.absorption.absorption_main_window import AbsorptionMainWindow
 
 # qudi GUI measurement modules must inherit qudi.core.module.GuiBase or other GUI modules.
 class AbsorptionGui(GuiBase):
-    """ This is a simple template GUI measurement module for qudi """
+    """ GUI for absorption imaging """
     # Signal declaration for outgoing control signals to logic
     sigAddToCounter = QtCore.Signal(int)  # add an integer value to the counter value
 
     # Connector declaration for a logic module to interact with
-    _template_logic = Connector(name='absorption_logic', interface='AbsorptionLogic')
+    _absorption_logic = Connector(name='absorption_logic', interface='AbsorptionLogic')
 
     # Declare static parameters that can/must be declared in the qudi configuration
     # _my_config_option = ConfigOption(name='my_config_option', default=1, missing='warn')
@@ -28,18 +28,18 @@ class AbsorptionGui(GuiBase):
     def on_activate(self) -> None:
         # initialize the main window
         self._mw = AbsorptionMainWindow()
-        self._mw.count_spinbox.setValue(self._template_logic().counter_value)
+        self._mw.count_spinbox.setValue(self._absorption_logic().counter_value)
         # connect all GUI internal signals
         self._mw.sub_ten_button.clicked.connect(self._subtract_ten)
         self._mw.add_ten_button.clicked.connect(self._add_ten)
         # Connect all signals to and from the logic. Make sure the connections are QueuedConnection.
         self.sigAddToCounter.connect(
-            self._template_logic().add_to_counter, QtCore.Qt.QueuedConnection
+            self._absorption_logic().add_to_counter, QtCore.Qt.QueuedConnection
         )
         self._mw.reset_button.clicked.connect(
-            self._template_logic().reset_counter, QtCore.Qt.QueuedConnection
+            self._absorption_logic().reset_counter, QtCore.Qt.QueuedConnection
         )
-        self._template_logic().sigCounterUpdated.connect(
+        self._absorption_logic().sigCounterUpdated.connect(
             self._mw.count_spinbox.setValue, QtCore.Qt.QueuedConnection
         )
         # Show the main window and raise it above all others
@@ -47,7 +47,7 @@ class AbsorptionGui(GuiBase):
 
     def on_deactivate(self) -> None:
         # Disconnect all connections done in "on_activate"
-        self._template_logic().sigCounterUpdated.disconnect(self._mw.count_spinbox.setValue)
+        self._absorption_logic().sigCounterUpdated.disconnect(self._mw.count_spinbox.setValue)
         # Use "plain" disconnects (without argument) only on signals owned by this module
         self._mw.reset_button.clicked.disconnect()
         self.sigAddToCounter.disconnect()
