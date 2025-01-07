@@ -36,8 +36,11 @@ class AbsorptionLogic(LogicBase):
     _counter_value = StatusVar(name='counter_value', default=0)
 
     # Declare connectors to other logic modules or hardware modules to interact with
+    # _camera_hardware = Connector(name='camera_hardware',
+    #                                interface='AbsorptionInterface',
+    #                                optional=True)
     _camera_hardware = Connector(name='camera_hardware',
-                                   interface='AbsorptionInterface',
+                                   interface='CameraInterface',
                                    optional=True)
 
     def __init__(self, *args, **kwargs):
