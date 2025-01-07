@@ -34,7 +34,7 @@ class GuppyPro(CameraInterface):
     _support_live = ConfigOption('support_live', True)
     _resolution = ConfigOption('resolution', (1280, 720))  # High-definition !
 
-    _live = True
+    _live = False
     _acquiring = False
     _exposure = ConfigOption('exposure', .1)
     _gain = ConfigOption('gain', 1.)
@@ -43,20 +43,19 @@ class GuppyPro(CameraInterface):
     def on_activate(self):
         """ Initialisation performed during activation of the module.
         """
-        # logger.info(self._vimbadaemon.get_camera_list())
-        
         camera_id = self._detection_to_id[self._camera_detection_number]
         with Vimba.get_instance() as self.vimba:
             try:
-                cam = self.vimba.get_camera_by_id(camera_id)
-                logger.info(
-                    f"VimbaDaemon : Detection{self._camera_detection_number} opened successfully !")
-                return cam
+                self.camera = self.vimba.get_camera_by_id(camera_id)
+                logger.info(f"Detection{self._camera_detection_number} \
+                    opened successfully !")                
+                return True
 
             except VimbaCameraError:
-                logger.error(f"Hardware error: Detection {self._camera_detection_number} was not found. \
+                logger.error(f"Detection {self._camera_detection_number} was not found. \
                              Please check that the camera is plugged in.")
-                raise VimbaCameraError('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
+                return False
+                # raise VimbaCameraError('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
                 
     def on_deactivate(self):
         """ Deinitialisation performed during deactivation of the module.
@@ -94,17 +93,34 @@ class GuppyPro(CameraInterface):
             self._acquiring = False
 
     def start_single_acquisition(self):
-        """ Start a single acquisition
-
-        @return bool: Success ?
-        """
+        """ Does not work yet 
+        @FIX ME later maybe """
         if self._live:
+            self.frame = np.zeros(self._resolution)
             return False
         else:
             self._acquiring = True
-            time.sleep(float(self._exposure+10/1000))
+            logger.info(f"Detection{self._camera_detection_number}: Starting acquisition")
+                
+            with self.camera as cam:
+                cam.TriggerSource.set("Software")
+                self.frame = cam.get_frame(timeout_ms=3000)
+            self.frame.convert_pixel_format(PixelFormat.Mono8)
+                
             self._acquiring = False
             return True
+        
+    def start_trigged_acquisition(self):
+        pass
+        
+        # def handler_single(cam: Camera, frame: Frame):
+        #     logging.info("GuppyCam    : Handling frame")
+        #     frame.convert_pixel_format(PixelFormat.Mono8)
+        #     self.last_frame = frame.as_opencv_image()
+        #     # Resetting the queue frame seems to be the best practice
+        #     cam.queue_frame(frame)
+        #     self.stopAcquisition.set()
+        
 
     def stop_acquisition(self):
         """ Stop/abort live or single acquisition
@@ -121,7 +137,7 @@ class GuppyPro(CameraInterface):
 
         Each pixel might be a float, integer or sub pixels
         """
-        data = np.random.random(self._resolution)*self._exposure*self._gain
+        data = self.frame
         return data.transpose()
 
     def set_exposure(self, exposure):
