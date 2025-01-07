@@ -14,7 +14,7 @@ class GuppyDummy(CameraInterface):
     """ Dummy module for AlliedVision GuppyPro camera
 
     Example config for copy-paste:
-
+o
     camera_dummy:
         module.Class: 'camera.camera_dummy.CameraDummy'
         options:
