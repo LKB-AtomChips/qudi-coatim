@@ -11,6 +11,7 @@ from qudi.core.configoption import ConfigOption
 from qudi.util.mutex import Mutex
 import logging
 from vimba import *
+from PySide2 import QtCore
 
 logging.basicConfig(filename='logfile.log', filemode='w', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -31,32 +32,37 @@ class GuppyPro(CameraInterface):
 
     # OPTIONS
     _camera_detection_number = ConfigOption('camera_detection_number', 2)
-    _support_live = ConfigOption('support_live', True)
-    _resolution = ConfigOption('resolution', (1280, 720))  # High-definition !
-
-    _live = False
-    _acquiring = False
+    _support_live = ConfigOption('support_live', False)
+    _resolution = ConfigOption('resolution', (656, 494))                    #(656, 494) for GuppyPro F031B
     _exposure = ConfigOption('exposure', .1)
     _gain = ConfigOption('gain', 1.)
+    _minimum_exposure_time = ConfigOption('minimum_exposure_time', 72e-6)   #72 µs for GuppyPro F031B
+
+    _buffer_count = ConfigOption('buffer-count', 5)
     
+    _live = False
+    _acquiring = False
     
+    sigNewFrame = QtCore.Signal()
+        
     def on_activate(self):
         """ Initialisation performed during activation of the module.
         """
-        camera_id = self._detection_to_id[self._camera_detection_number]
+        self._camera_id = self._detection_to_id[self._camera_detection_number]
+        self._request_acquisition_stop = False
+        
         with Vimba.get_instance() as self.vimba:
             try:
-                self.camera = self.vimba.get_camera_by_id(camera_id)
+                self.camera = self.vimba.get_camera_by_id(self._camera_id)
                 logger.info(f"Detection{self._camera_detection_number} \
-                    opened successfully !")                
+                    opened successfully !")
                 return True
 
             except VimbaCameraError:
                 logger.error(f"Detection {self._camera_detection_number} was not found. \
                              Please check that the camera is plugged in.")
-                return False
-                # raise VimbaCameraError('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
-                
+                raise VimbaCameraError('Failed to access Camera \'{}\'. Abort.'.format(self._camera_detection_number))
+        
     def on_deactivate(self):
         """ Deinitialisation performed during deactivation of the module.
         """
@@ -67,7 +73,7 @@ class GuppyPro(CameraInterface):
 
         @return string: name for the camera
         """
-        return self._camera_name
+        return self._camera_detection_number
 
     def get_size(self):
         """ Retrieve size of the image in pixel
@@ -93,42 +99,67 @@ class GuppyPro(CameraInterface):
             self._acquiring = False
 
     def start_single_acquisition(self):
-        """ Does not work yet 
-        @FIX ME later maybe """
+        """ Takes a single trigged image """
         if self._live:
-            self.frame = np.zeros(self._resolution)
+            # self.frame = np.zeros(self._resolution)
             return False
         else:
             self._acquiring = True
             logger.info(f"Detection{self._camera_detection_number}: Starting acquisition")
-                
-            with self.camera as cam:
-                cam.TriggerSource.set("Software")
-                self.frame = cam.get_frame(timeout_ms=3000)
-            self.frame.convert_pixel_format(PixelFormat.Mono8)
-                
+            
+            with Vimba.get_instance() as vimba:
+                logger.info(f"Opening Vimba camera API")
+                camera = vimba.get_camera_by_id(self._camera_id)
+                with camera as cam:
+                    logger.info(f"Detection{self._camera_detection_number}: Starting single frame acquisition")
+                    raw_frame = cam.get_frame(timeout_ms=100000)
+                    logger.info("A frame was just captured!")
+                    self.frame = self._convert_frame_to_img(raw_frame)
+            logger.info(f"Frame type: {type(self.frame)}")
             self._acquiring = False
+            logger.info(f"Detection{self._camera_detection_number}: Ending acquisition")
+            self.sigNewFrame.emit()
             return True
+    
+    def _convert_frame_to_img(self, frame):
+        logger.info("Converting frame format")
+        return np.array(frame.as_opencv_image().transpose()[0, :, :])
         
     def start_trigged_acquisition(self):
-        pass
-        
-        # def handler_single(cam: Camera, frame: Frame):
-        #     logging.info("GuppyCam    : Handling frame")
-        #     frame.convert_pixel_format(PixelFormat.Mono8)
-        #     self.last_frame = frame.as_opencv_image()
-        #     # Resetting the queue frame seems to be the best practice
-        #     cam.queue_frame(frame)
-        #     self.stopAcquisition.set()
-        
-
+        """
+        Starts acquisition of camera.
+        """
+        def handler(cam: Camera, frame: Frame):
+            """ This function gets called every time a frame gets captured. """
+            logging.info(f"Detection{self._camera_detection_number}: A frame was captured")
+            frame.convert_pixel_format(PixelFormat.Mono8)
+            self.frame = frame.as_opencv_image()
+            # Resetting the queue frame seems to be the best practice
+            cam.queue_frame(frame)
+            # self.stopAcquisition.set()
+            
+        with Vimba.get_instance() as vimba:
+            logger.info(f"Opening Vimba camera API")
+            camera = vimba.get_camera_by_id(self._camera_id)
+            with camera as cam:
+                logging.info(f"Detection{self._camera_detection_number}: Starting acquisition")
+                self._acquiring = True
+                cam.TriggerSource.set("InputLines")
+                cam.TriggerMode.set("On")
+                cam.start_streaming(handler, buffer_count=self._buffer_count)
+                while not self._request_acquisition_stop:
+                    pass
+                
+                logging.info(f"Detection{self._camera_detection_number}: Stopping acquisition")
+                cam.stop_streaming()
+                self._request_acquisition_stop = False
+                    
     def stop_acquisition(self):
         """ Stop/abort live or single acquisition
 
         @return bool: Success ?
         """
-        self._live = False
-        self._acquiring = False
+        self._request_acquisition_stop = True
 
     def get_acquired_data(self):
         """ Return an array of last acquired image.

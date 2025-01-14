@@ -87,7 +87,7 @@ class CameraGui(GuiBase):
 
     """
 
-    _camera_logic = Connector(name='camera_logic', interface='CameraLogic')
+    _camera_logic = Connector(name='camera_logic', interface='GuppyLogic')
 
     sigStartStopVideoToggled = QtCore.Signal(bool)
     sigCaptureFrameTriggered = QtCore.Signal()
