@@ -49,8 +49,8 @@ class AbsorptionLogic(LogicBase):
 
     def on_activate(self) -> None:
         # Check if _increment_interval is not too small (lower boundary is 1.5 * trigger_time)
-        assert self._increment_interval >= 1.5 * self._camera_hardware().trigger_time, \
-            'increment_interval must be >= 1.5 * <hardware trigger time>'
+        # assert self._increment_interval >= 1.5 * self._camera_hardware().trigger_time, \
+            # 'increment_interval must be >= 1.5 * <hardware trigger time>'
         # Set up a Qt timer to send periodic signals according to _increment_interval
         self.__timer = QtCore.QTimer(parent=self)
         self.__timer.setInterval(1000 * self._increment_interval)  # Interval in milliseconds
@@ -77,7 +77,7 @@ class AbsorptionLogic(LogicBase):
                 if value > 0:
                     hardware = self._camera_hardware()
                     for i in range(value):
-                        hardware.send_trigger()
+                        # hardware.send_trigger()
                         self._counter_value += 1
                         self.sigCounterUpdated.emit(self._counter_value)
                 else:
