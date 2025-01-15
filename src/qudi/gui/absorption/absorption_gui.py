@@ -10,49 +10,10 @@ from qudi.core.connector import Connector
 from qudi.core.module import GuiBase
 from qudi.gui.absorption.camera_settings_dialog import CameraSettingsDialog
 from qudi.util.datastorage import TextDataStorage
-
-# class AbsorptionMainWindow(QtWidgets.QMainWindow):
-#     """ This is the generic QMainWindow subclass to be used with the qudi absorption_gui.py module.
-#     """
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         # Construct a simple GUI window with some widgets to tinker with
-#         self.setWindowTitle('qudi: Template GUI')
-#         # Initialize widgets
-#         self.reset_button = QtWidgets.QPushButton('Reset')
-#         self.reset_button.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-#                                         QtWidgets.QSizePolicy.Expanding)
-#         self.add_ten_button = QtWidgets.QPushButton('+10')
-#         self.sub_ten_button = QtWidgets.QPushButton('-10')
-#         self.count_spinbox = QtWidgets.QSpinBox()
-#         self.count_spinbox.setReadOnly(True)
-#         self.count_spinbox.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-#         self.count_spinbox.setAlignment(QtCore.Qt.AlignHCenter)
-#         self.count_spinbox.setRange(-2**31, 2**31-1)
-#         self.count_spinbox.setValue(0)
-#         self.label = QtWidgets.QLabel('Useless counter TER...')
-#         font = QtGui.QFont()
-#         font.setBold(True)
-#         self.label.setFont(font)
-#         # arrange widgets in layout
-#         layout = QtWidgets.QGridLayout()
-#         layout.addWidget(self.label, 0, 0, 1, 3)
-#         layout.addWidget(self.sub_ten_button, 1, 0)
-#         layout.addWidget(self.count_spinbox, 1, 1)
-#         layout.addWidget(self.add_ten_button, 1, 2)
-#         layout.addWidget(self.reset_button, 2, 0, 1, 3)
-#         layout.setColumnStretch(1, 1)
-#         # Create dummy widget as main widget and set layout
-#         central_widget = QtWidgets.QWidget()
-#         central_widget.setLayout(layout)
-#         self.setCentralWidget(central_widget)
-
-class AbsorptionMainWindow(QtWidgets.QMainWindow):
-    def __init__(self):
-        super().__init__()
+from qudi.gui.absorption.pyqt_classes import mainwindow #, displaypanel, acquisitionpanel, atomnumberpanel, camerasettingspanel
         
 class AbsorptionGui(GuiBase):
-    """ Main camera gui class.
+    """ Main gui class for absorption imaging.
 
     Example config for copy-paste: (TO BE MODIFIED)
 
@@ -60,7 +21,6 @@ class AbsorptionGui(GuiBase):
         module.Class: 'camera.cameragui.CameraGui'
         connect:
             absorption_logic: camera_logic
-
     """
 
     # _camera_logic = Connector(name='camera_logic', interface='GuppyLogic')
@@ -80,7 +40,7 @@ class AbsorptionGui(GuiBase):
         logic = self._absorption_logic()
 
         # Create main window
-        self._mw = AbsorptionMainWindow()
+        self._mw = mainwindow.AbsorptionMainWindow()
         # Create settings dialog
         self._settings_dialog = CameraSettingsDialog(self._mw)
         # Connect the action of the settings dialog with this module
