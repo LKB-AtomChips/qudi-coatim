@@ -10,20 +10,20 @@ from qudi.core.connector import Connector
 from qudi.core.module import GuiBase
 from qudi.gui.absorption.camera_settings_dialog import CameraSettingsDialog
 from qudi.util.datastorage import TextDataStorage
-from qudi.gui.absorption.pyqt_classes import mainwindow #, displaypanel, acquisitionpanel, atomnumberpanel, camerasettingspanel
+from qudi.gui.absorption import mainwindow
         
 class AbsorptionGui(GuiBase):
     """ Main gui class for absorption imaging.
-
     Example config for copy-paste: (TO BE MODIFIED)
 
     camera_gui:
         module.Class: 'camera.cameragui.CameraGui'
         connect:
-            absorption_logic: camera_logic
+            absorption_logic:
+            camera_logic:
     """
 
-    # _camera_logic = Connector(name='camera_logic', interface='GuppyLogic')
+    _camera_logic = Connector(name='camera_logic', interface='GuppyLogic')
     _absorption_logic = Connector(name='absorption_logic', interface='AbsorptionLogic')
 
     sigStartStopVideoToggled = QtCore.Signal(bool)

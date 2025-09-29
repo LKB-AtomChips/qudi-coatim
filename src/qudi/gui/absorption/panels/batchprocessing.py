@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['Absorption_pyqtAcquisitionPanel']
+__all__ = ['Absorption_BatchProcessingPanel']
 
 import os
 import datetime
@@ -11,8 +11,10 @@ from qudi.core.module import GuiBase
 from qudi.gui.absorption.camera_settings_dialog import CameraSettingsDialog
 from qudi.util.datastorage import TextDataStorage
 
-class AtomNumberPanel(QtWidgets.QGroupBox):
+class BatchProcessingPanel(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):
         super().__init__( *args, **kwargs)
-        self.setTitle("Atom Number")
+        self.setTitle("Batch Processing")
         self.setCheckable(True)
+        self.setChecked(False)
+        

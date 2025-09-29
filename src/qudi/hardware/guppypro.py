@@ -138,17 +138,19 @@ class GuppyPro(CameraInterface):
             cam.queue_frame(frame)
             # self.stopAcquisition.set()
             
+            
         with Vimba.get_instance() as vimba:
             logger.info(f"Opening Vimba camera API")
             camera = vimba.get_camera_by_id(self._camera_id)
+            logger.info(f"Detection{self._camera_detection_number}: Camera is opened")
             with camera as cam:
                 logging.info(f"Detection{self._camera_detection_number}: Starting acquisition")
                 self._acquiring = True
                 cam.TriggerSource.set("InputLines")
                 cam.TriggerMode.set("On")
                 cam.start_streaming(handler, buffer_count=self._buffer_count)
-                while not self._request_acquisition_stop:
-                    pass
+                
+                time.sleep(10)
                 
                 logging.info(f"Detection{self._camera_detection_number}: Stopping acquisition")
                 cam.stop_streaming()

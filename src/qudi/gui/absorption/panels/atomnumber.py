@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['Absorption_pyqtAcquisitionPanel']
+__all__ = ['Absorption_AtomNumberPanel']
 
 import os
 import datetime
@@ -11,6 +11,8 @@ from qudi.core.module import GuiBase
 from qudi.gui.absorption.camera_settings_dialog import CameraSettingsDialog
 from qudi.util.datastorage import TextDataStorage
 
-class AcquisitionPanel(QtWidgets.QGroupBox):
+class AtomNumberPanel(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):
         super().__init__( *args, **kwargs)
+        self.setTitle("Atom Number")
+        self.setCheckable(False)

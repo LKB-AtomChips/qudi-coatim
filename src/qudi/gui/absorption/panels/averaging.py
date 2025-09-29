@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['Absorption_pyqtCameraSettingsPanel']
+__all__ = ['Absorption_AveragingPanel']
 
 import os
 import datetime
@@ -11,6 +11,9 @@ from qudi.core.module import GuiBase
 from qudi.gui.absorption.camera_settings_dialog import CameraSettingsDialog
 from qudi.util.datastorage import TextDataStorage
 
-class CameraSettingsPanel(QtWidgets.QGroupBox):
+class AveragingPanel(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):
         super().__init__( *args, **kwargs)
+        self.setTitle("Averaging")
+        self.setCheckable(True)
+        self.setChecked(False)
